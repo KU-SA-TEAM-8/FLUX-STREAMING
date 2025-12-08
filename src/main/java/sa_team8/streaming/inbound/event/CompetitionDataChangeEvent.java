@@ -20,6 +20,7 @@ public class CompetitionDataChangeEvent extends BaseEvent {
       String description,
       Instant startTime,
       Integer totalTime,
+      CompetitionStateEnum state,
       List<ScoreBoardTeamRow> teams
   ) {
 
