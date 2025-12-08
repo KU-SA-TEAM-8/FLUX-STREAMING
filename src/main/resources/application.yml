@@ -1,0 +1,30 @@
+server:
+  port: 8081
+
+spring:
+  profiles:
+    active: local
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+    listener:
+      simple:
+        default-requeue-rejected: false
+        acknowledge-mode: auto
+
+scoreboard:
+  rabbitmq:
+    exchange: ${SCOREBOARD_EXCHANGE}
+    queue:
+      score: ${SCOREBOARD_QUEUE_SCORE}
+      competition: ${SCOREBOARD_QUEUE_COMP}
+
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+    import: optional:application-local.yml
