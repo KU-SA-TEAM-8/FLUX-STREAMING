@@ -8,6 +8,6 @@ import sa_team8.streaming.outbound.message.ScoreBoardOutboundMessage;
 @Getter
 public class ScoreUpdateOutboundMessage extends ScoreBoardOutboundMessage {
   public ScoreUpdateOutboundMessage(ScoreUpdateEvent event) {
-    super(MessageType.SCORE_UPDATE, event);
+    super(event.getPublicId(), MessageType.SCORE_UPDATE, event);
   }
 }

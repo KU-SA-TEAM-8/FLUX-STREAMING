@@ -11,6 +11,7 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class CompetitionDataChangeEvent extends BaseEvent {
+  private String publicId;
   private ScoreBoardRes scoreBoard;
   private List<ScoreHistoryRes> scoreHistories;
 

@@ -7,6 +7,6 @@ import sa_team8.streaming.outbound.message.ScoreBoardOutboundMessage;
 @Getter
 public class CompetitionDataChangeOutboundMessage extends ScoreBoardOutboundMessage {
   public CompetitionDataChangeOutboundMessage(CompetitionDataChangeEvent event) {
-    super(MessageType.COMPETITION_DATA_CHANGE, event);
+    super(event.getPublicId(), MessageType.COMPETITION_DATA_CHANGE, event);
   }
 }

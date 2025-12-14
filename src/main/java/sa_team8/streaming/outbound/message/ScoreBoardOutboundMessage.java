@@ -6,6 +6,7 @@ import sa_team8.streaming.inbound.event.BaseEvent;
 @Getter
 @AllArgsConstructor
 public abstract class ScoreBoardOutboundMessage {
+  private String publicId;
   private MessageType type; // "COMPETITION_DATA_CHANGE" or "SCORE_UPDATE"
   private BaseEvent payload;
 }

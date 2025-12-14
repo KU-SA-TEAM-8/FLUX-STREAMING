@@ -1,5 +1,6 @@
 package sa_team8.streaming.outbound.websocket;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
@@ -15,44 +16,56 @@ import sa_team8.streaming.domain.ScoreboardSink;
 @Component
 public class ScoreBoardWebSocketHandler implements WebSocketHandler {
 
-  // 현재 연결된 모든 세션
-  private final Set<WebSocketSession> sessions =
-      ConcurrentHashMap.newKeySet();
+  // publicId → sessions
+  private final Map<String, Set<WebSocketSession>> sessions =
+      new ConcurrentHashMap<>();
 
   @Override
   public Mono<Void> handle(WebSocketSession session) {
-    sessions.add(session);
-    log.info("[WS] Client connected: {}", session.getId());
+    String publicId = extractPublicId(session);
 
-    // 클라이언트로부터 메시지는 사용 안 함 (연결 유지용)
+    sessions
+        .computeIfAbsent(publicId, k -> ConcurrentHashMap.newKeySet())
+        .add(session);
+
+    log.info("[WS] Client connected. publicId={}, session={}",
+        publicId, session.getId());
+
     return session.receive()
-        .doOnError(e ->
-            log.warn("[WS] Receive error. session={}, error={}",
-                session.getId(), e.getMessage()))
         .doFinally(signal -> {
-          sessions.remove(session);
-          log.info("[WS] Client disconnected: {}, signal={}",
-              session.getId(), signal);
+          Set<WebSocketSession> set = sessions.get(publicId);
+          if (set != null) {
+            set.remove(session);
+            if (set.isEmpty()) {
+              sessions.remove(publicId);
+            }
+          }
+
+          log.info("[WS] Client disconnected. publicId={}, session={}, signal={}",
+              publicId, session.getId(), signal);
         })
         .then();
   }
 
-  /**
-   * 서버 → 클라이언트 이벤트 push
-   */
-  public void push(String json) {
-    if (sessions.isEmpty()) {
+  public void push(String publicId, String json) {
+    Set<WebSocketSession> targetSessions = sessions.get(publicId);
+    if (targetSessions == null || targetSessions.isEmpty()) {
       return;
     }
 
-    sessions.removeIf(session -> !session.isOpen());
+    targetSessions.removeIf(s -> !s.isOpen());
 
-    sessions.forEach(session -> {
-      session.send(Mono.just(session.textMessage(json)))
-          .doOnError(e ->
-              log.warn("[WS] Send failed. session={}, error={}",
-                  session.getId(), e.getMessage()))
-          .subscribe();
-    });
+    targetSessions.forEach(session ->
+        session.send(Mono.just(session.textMessage(json)))
+            .doOnError(e ->
+                log.warn("[WS] Send failed. publicId={}, session={}, error={}",
+                    publicId, session.getId(), e.getMessage()))
+            .subscribe()
+    );
+  }
+
+  private String extractPublicId(WebSocketSession session) {
+    String path = session.getHandshakeInfo().getUri().getPath();
+    return path.substring(path.lastIndexOf('/') + 1);
   }
 }

@@ -20,7 +20,7 @@ public class FinalOutboundStep {
   public void handle(ScoreBoardOutboundMessage msg) {
     try {
       String json = objectMapper.writeValueAsString(msg);
-      handler.push(json);
+      handler.push(msg.getPublicId(), json);
     } catch (JsonProcessingException e) {
       log.error("Failed to serialize CompetitionDataChangeEvent", e);
     }
