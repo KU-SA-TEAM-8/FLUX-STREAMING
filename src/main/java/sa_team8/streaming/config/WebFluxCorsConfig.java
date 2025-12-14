@@ -20,7 +20,8 @@ public class WebFluxCorsConfig {
         "http://127.0.0.1:5173",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "http://localhost:8081"
+        "http://localhost:8081",
+        "https://ku-sa-team-8.github.io"
     ));
 
     config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
