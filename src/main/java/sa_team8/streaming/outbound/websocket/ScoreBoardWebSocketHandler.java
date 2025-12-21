@@ -3,18 +3,16 @@ package sa_team8.streaming.outbound.websocket;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.socket.WebSocketHandler;
 import org.springframework.web.reactive.socket.WebSocketSession;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import sa_team8.streaming.domain.ScoreboardSink;
+import sa_team8.streaming.outbound.OutboundHandler;
 
 @Slf4j
 @Component
-public class ScoreBoardWebSocketHandler implements WebSocketHandler {
+public class ScoreBoardWebSocketHandler implements WebSocketHandler, OutboundHandler {
 
   // publicId → sessions
   private final Map<String, Set<WebSocketSession>> sessions =
@@ -47,6 +45,7 @@ public class ScoreBoardWebSocketHandler implements WebSocketHandler {
         .then();
   }
 
+  @Override
   public void push(String publicId, String json) {
     Set<WebSocketSession> targetSessions = sessions.get(publicId);
     if (targetSessions == null || targetSessions.isEmpty()) {

@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import sa_team8.streaming.domain.ScoreboardSink;
+import sa_team8.streaming.outbound.OutboundHandler;
 import sa_team8.streaming.outbound.message.ScoreBoardOutboundMessage;
 import sa_team8.streaming.outbound.websocket.ScoreBoardWebSocketHandler;
 
@@ -14,7 +14,7 @@ import sa_team8.streaming.outbound.websocket.ScoreBoardWebSocketHandler;
 @RequiredArgsConstructor
 public class FinalOutboundStep {
 
-  private final ScoreBoardWebSocketHandler handler;
+  private final OutboundHandler handler;
   private final ObjectMapper objectMapper;
 
   public void handle(ScoreBoardOutboundMessage msg) {
